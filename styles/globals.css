@@ -1,0 +1,65 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: system-ui, sans-serif;
+  }
+  
+  body {
+    @apply bg-black text-white min-h-screen;
+    background: linear-gradient(135deg, #000000 0%, #0f172a 50%, #1e3a8a 100%);
+    background-attachment: fixed;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 
+           text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 
+           transform hover:scale-105 shadow-lg hover:shadow-blue-500/25;
+  }
+  
+  .btn-secondary {
+    @apply bg-gray-800 hover:bg-gray-700 text-white font-semibold py-3 px-6 
+           rounded-lg transition-all duration-300 border border-gray-600 hover:border-blue-500;
+  }
+  
+  .card {
+    @apply bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-xl p-6 
+           shadow-xl hover:shadow-2xl transition-all duration-300;
+  }
+  
+  .input-field {
+    @apply bg-gray-800/50 border border-gray-700 rounded-lg px-4 py-3 text-white 
+           placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 
+           focus:border-transparent transition-all duration-300;
+  }
+  
+  .gradient-text {
+    @apply bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent;
+  }
+  
+  .message-bubble {
+    @apply rounded-2xl p-4 max-w-xs shadow-lg transition-all duration-300 hover:shadow-xl;
+  }
+  
+  .message-sent {
+    @apply bg-gradient-to-r from-blue-600 to-blue-700 text-white ml-auto;
+  }
+  
+  .message-received {
+    @apply bg-gray-800 text-white mr-auto border border-gray-700;
+  }
+}
+
+@layer utilities {
+  .animate-pulse-slow {
+    animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+  
+  .text-shadow {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  }
+}
