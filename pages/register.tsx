@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useAccount, useSigner } from 'wagmi';
+import { useAccount } from 'wagmi';
+import { useWalletClient } from 'wagmi';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { toast } from 'react-hot-toast';
 import { ENSService } from '@/lib/ens';
@@ -8,7 +9,7 @@ import { ENS_CONFIG } from '@/lib/config';
 
 const RegisterPage: React.FC = () => {
   const { address, isConnected } = useAccount();
-  const { data: signer } = useSigner();
+  const { data: walletClient } = useWalletClient();
   
   const [subdomain, setSubdomain] = useState('');
   const [displayName, setDisplayName] = useState('');
@@ -63,7 +64,7 @@ const RegisterPage: React.FC = () => {
   };
 
   const handleRegister = async () => {
-    if (!isConnected || !signer || !address) {
+    if (!isConnected || !walletClient || !address) {
       toast.error('Please connect your wallet');
       return;
     }
@@ -86,7 +87,7 @@ const RegisterPage: React.FC = () => {
 
       // Claim the subdomain
       toast.loading('Claiming subdomain...');
-      const claimTx = await ensService.claimSubdomain(subdomain, address, signer);
+      const claimTx = await ensService.claimSubdomain(subdomain, address, walletClient);
       toast.dismiss();
       toast.success('Subdomain claimed successfully!');
 
@@ -97,7 +98,7 @@ const RegisterPage: React.FC = () => {
           `${subdomain}.${ENS_CONFIG.BASE_DOMAIN}`,
           'displayName',
           displayName,
-          signer
+          walletClient
         );
         toast.dismiss();
       }
@@ -108,7 +109,7 @@ const RegisterPage: React.FC = () => {
           `${subdomain}.${ENS_CONFIG.BASE_DOMAIN}`,
           'avatar',
           avatarUrl,
-          signer
+          walletClient
         );
         toast.dismiss();
       }
@@ -119,7 +120,7 @@ const RegisterPage: React.FC = () => {
         `${subdomain}.${ENS_CONFIG.BASE_DOMAIN}`,
         'inboxPointer',
         address,
-        signer
+        walletClient
       );
       toast.dismiss();
 

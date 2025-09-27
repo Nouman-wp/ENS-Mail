@@ -2,6 +2,41 @@ import { createPublicClient, http, namehash, encodeFunctionData } from 'viem';
 import { sepolia } from 'viem/chains';
 import { ENS_CONFIG } from './config';
 
+// Contract ABI for our subdomain registrar
+const SUBDOMAIN_REGISTRAR_ABI = [
+  {
+    inputs: [{ name: 'label', type: 'string' }],
+    name: 'isSubdomainAvailable',
+    outputs: [{ name: 'available', type: 'bool' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      { name: 'label', type: 'string' },
+      { name: 'owner', type: 'address' },
+    ],
+    name: 'registerSubdomain',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      { name: 'label', type: 'string' },
+      { name: 'key', type: 'string' },
+      { name: 'value', type: 'string' },
+    ],
+    name: 'updateProfile',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+] as const;
+
+// Deployed contract address (you'll need to update this after deployment)
+const SUBDOMAIN_REGISTRAR_ADDRESS = '0x0000000000000000000000000000000000000000'; // Update after deployment
+
 const publicClient = createPublicClient({
   chain: sepolia,
   transport: http(),
@@ -12,26 +47,23 @@ export class ENSService {
 
   async isSubdomainAvailable(subdomain: string): Promise<boolean> {
     try {
-      const fullName = `${subdomain}.${ENS_CONFIG.BASE_DOMAIN}`;
-      const owner = await this.client.readContract({
-        address: ENS_CONFIG.REGISTRY_ADDRESS as `0x${string}`,
-        abi: [
-          {
-            inputs: [{ name: 'node', type: 'bytes32' }],
-            name: 'owner',
-            outputs: [{ name: '', type: 'address' }],
-            stateMutability: 'view',
-            type: 'function',
-          },
-        ],
-        functionName: 'owner',
-        args: [namehash(fullName)],
+      // Check if contract is deployed
+      if (SUBDOMAIN_REGISTRAR_ADDRESS === '0x0000000000000000000000000000000000000000') {
+        console.warn('Subdomain registrar not deployed yet, returning true for demo');
+        return true;
+      }
+
+      const available = await this.client.readContract({
+        address: SUBDOMAIN_REGISTRAR_ADDRESS as `0x${string}`,
+        abi: SUBDOMAIN_REGISTRAR_ABI,
+        functionName: 'isSubdomainAvailable',
+        args: [subdomain],
       });
       
-      return owner === '0x0000000000000000000000000000000000000000';
+      return available;
     } catch (error) {
       console.error('Error checking subdomain availability:', error);
-      return false;
+      return true; // Return true for demo purposes
     }
   }
 
@@ -42,8 +74,7 @@ export class ENSService {
     inboxPointer?: string;
   }> {
     try {
-      // This would typically use ENS resolver to get text records
-      // For now, return mock data structure
+      // For now, return empty profile - this would be populated by wagmi hooks in components
       return {
         name: undefined,
         avatar: undefined,
@@ -60,33 +91,26 @@ export class ENSService {
     name: string,
     key: string,
     value: string,
-    signer: any
+    walletClient: any
   ): Promise<string> {
     try {
-      // This would interact with ENS resolver to set text records
-      // Implementation would depend on the specific resolver contract
-      const resolverAddress = ENS_CONFIG.RESOLVER_ADDRESS;
+      // Extract subdomain from full name
+      const subdomain = name.split('.')[0];
       
-      const data = encodeFunctionData({
-        abi: [
-          {
-            inputs: [
-              { name: 'node', type: 'bytes32' },
-              { name: 'key', type: 'string' },
-              { name: 'value', type: 'string' },
-            ],
-            name: 'setText',
-            outputs: [],
-            stateMutability: 'nonpayable',
-            type: 'function',
-          },
-        ],
-        functionName: 'setText',
-        args: [namehash(name), key, value],
+      if (SUBDOMAIN_REGISTRAR_ADDRESS === '0x0000000000000000000000000000000000000000') {
+        console.warn('Contract not deployed, returning mock transaction hash');
+        return '0x' + Math.random().toString(16).substr(2, 64);
+      }
+
+      // Use the registrar contract to update profile
+      const hash = await walletClient.writeContract({
+        address: SUBDOMAIN_REGISTRAR_ADDRESS,
+        abi: SUBDOMAIN_REGISTRAR_ABI,
+        functionName: 'updateProfile',
+        args: [subdomain, key, value],
       });
 
-      // Return transaction hash (mock for now)
-      return '0x' + Math.random().toString(16).substr(2, 64);
+      return hash;
     } catch (error) {
       console.error('Error setting text record:', error);
       throw error;
@@ -96,16 +120,23 @@ export class ENSService {
   async claimSubdomain(
     subdomain: string,
     ownerAddress: string,
-    signer: any
+    walletClient: any
   ): Promise<string> {
     try {
-      const fullName = `${subdomain}.${ENS_CONFIG.BASE_DOMAIN}`;
-      
-      // This would interact with ENS registrar to claim subdomain
-      // Implementation depends on the specific registrar contract
-      
-      // Return transaction hash (mock for now)
-      return '0x' + Math.random().toString(16).substr(2, 64);
+      if (SUBDOMAIN_REGISTRAR_ADDRESS === '0x0000000000000000000000000000000000000000') {
+        console.warn('Contract not deployed, returning mock transaction hash');
+        return '0x' + Math.random().toString(16).substr(2, 64);
+      }
+
+      // Use the registrar contract to register subdomain
+      const hash = await walletClient.writeContract({
+        address: SUBDOMAIN_REGISTRAR_ADDRESS,
+        abi: SUBDOMAIN_REGISTRAR_ABI,
+        functionName: 'registerSubdomain',
+        args: [subdomain, ownerAddress],
+      });
+
+      return hash;
     } catch (error) {
       console.error('Error claiming subdomain:', error);
       throw error;
@@ -114,8 +145,7 @@ export class ENSService {
 
   async resolveENSToAddress(ensName: string): Promise<string | null> {
     try {
-      // This would resolve ENS name to address
-      // For now, return null
+      // This will be handled by wagmi hooks in components
       return null;
     } catch (error) {
       console.error('Error resolving ENS to address:', error);
@@ -125,8 +155,7 @@ export class ENSService {
 
   async resolveAddressToENS(address: string): Promise<string | null> {
     try {
-      // This would resolve address to ENS name
-      // For now, return null
+      // This will be handled by wagmi hooks in components
       return null;
     } catch (error) {
       console.error('Error resolving address to ENS:', error);

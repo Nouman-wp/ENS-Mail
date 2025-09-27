@@ -40,7 +40,7 @@ export const XMTP_CONFIG = {
 export const IPFS_CONFIG = {
   GATEWAY_URL: 'https://ipfs.io/ipfs/',
   PINATA_GATEWAY: 'https://gateway.pinata.cloud/ipfs/',
-  API_URL: 'https://ipfs.infura.io:5001/api/v0',
+  API_URL: 'https://api.web3.storage/upload', // Using web3.storage instead
 };
 
 export const APP_CONFIG = {

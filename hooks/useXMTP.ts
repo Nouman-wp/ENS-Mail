@@ -1,10 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useSigner } from 'wagmi';
+import { useWalletClient } from 'wagmi';
 import { XMTPService } from '@/lib/xmtp';
 import { Message, Conversation } from '@/types';
 
 export const useXMTP = () => {
-  const { data: signer } = useSigner();
+  const { data: walletClient } = useWalletClient();
   const [xmtpService] = useState(() => new XMTPService());
   const [isInitialized, setIsInitialized] = useState(false);
   const [conversations, setConversations] = useState<Conversation[]>([]);
@@ -14,7 +14,7 @@ export const useXMTP = () => {
   // Initialize XMTP
   useEffect(() => {
     const initialize = async () => {
-      if (!signer) {
+      if (!walletClient) {
         setIsInitialized(false);
         return;
       }
@@ -23,7 +23,7 @@ export const useXMTP = () => {
       setError(null);
 
       try {
-        await xmtpService.initialize(signer);
+        await xmtpService.initialize(walletClient);
         setIsInitialized(true);
       } catch (err) {
         console.error('Failed to initialize XMTP:', err);
@@ -35,7 +35,7 @@ export const useXMTP = () => {
     };
 
     initialize();
-  }, [signer, xmtpService]);
+  }, [walletClient, xmtpService]);
 
   // Load conversations
   const loadConversations = useCallback(async () => {

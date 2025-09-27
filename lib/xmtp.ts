@@ -1,14 +1,13 @@
 import { Client, Conversation } from '@xmtp/xmtp-js';
-import { Signer } from 'ethers';
 import { Message } from '@/types';
 
 export class XMTPService {
   private client: Client | null = null;
   private conversations: Map<string, Conversation> = new Map();
 
-  async initialize(signer: Signer): Promise<void> {
+  async initialize(walletClient: any): Promise<void> {
     try {
-      this.client = await Client.create(signer, {
+      this.client = await Client.create(walletClient, {
         env: 'production',
       });
       console.log('XMTP client initialized');

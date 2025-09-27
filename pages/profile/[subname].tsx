@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { useAccount, useSigner } from 'wagmi';
+import { useAccount } from 'wagmi';
+import { useWalletClient } from 'wagmi';
 import { toast } from 'react-hot-toast';
 import { ENSService } from '@/lib/ens';
 import { IPFSService } from '@/lib/ipfs';
@@ -11,7 +12,7 @@ const ProfilePage: React.FC = () => {
   const router = useRouter();
   const { subname } = router.query;
   const { address, isConnected } = useAccount();
-  const { data: signer } = useSigner();
+  const { data: walletClient } = useWalletClient();
 
   const [profile, setProfile] = useState<ENSProfile | null>(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -107,7 +108,7 @@ const ProfilePage: React.FC = () => {
   };
 
   const handleSave = async () => {
-    if (!isConnected || !signer || !profile) {
+    if (!isConnected || !walletClient || !profile) {
       toast.error('Please connect your wallet');
       return;
     }
@@ -134,27 +135,27 @@ const ProfilePage: React.FC = () => {
 
       if (displayName !== profile.displayName) {
         toast.loading('Updating display name...');
-        await ensService.setTextRecord(fullName, 'displayName', displayName, signer);
+        await ensService.setTextRecord(fullName, 'displayName', displayName, walletClient);
         toast.dismiss();
       }
 
       if (avatarUrl !== profile.avatar) {
         toast.loading('Updating avatar...');
-        await ensService.setTextRecord(fullName, 'avatar', avatarUrl || '', signer);
+        await ensService.setTextRecord(fullName, 'avatar', avatarUrl || '', walletClient);
         toast.dismiss();
       }
 
       // Update additional metadata
       if (bio) {
-        await ensService.setTextRecord(fullName, 'description', bio, signer);
+        await ensService.setTextRecord(fullName, 'description', bio, walletClient);
       }
 
       if (website) {
-        await ensService.setTextRecord(fullName, 'url', website, signer);
+        await ensService.setTextRecord(fullName, 'url', website, walletClient);
       }
 
       if (twitter) {
-        await ensService.setTextRecord(fullName, 'com.twitter', twitter, signer);
+        await ensService.setTextRecord(fullName, 'com.twitter', twitter, walletClient);
       }
 
       // Update local state

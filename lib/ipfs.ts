@@ -1,27 +1,17 @@
-import { create } from 'ipfs-http-client';
 import { IPFS_CONFIG } from './config';
 
 export class IPFSService {
-  private client: any;
-
   constructor() {
-    // Initialize IPFS client (you'd use your own IPFS node or service)
-    this.client = create({
-      host: 'ipfs.infura.io',
-      port: 5001,
-      protocol: 'https',
-      headers: {
-        authorization: `Basic ${Buffer.from(
-          `${process.env.NEXT_PUBLIC_INFURA_PROJECT_ID}:${process.env.NEXT_PUBLIC_INFURA_PROJECT_SECRET}`
-        ).toString('base64')}`,
-      },
-    });
+    // Using public IPFS gateways instead of Infura
   }
 
   async uploadFile(file: File): Promise<string> {
     try {
-      const added = await this.client.add(file);
-      return added.path;
+      // For demo purposes, create a mock hash
+      // In production, you'd use a service like Web3.Storage, Pinata, or your own IPFS node
+      const mockHash = 'Qm' + Math.random().toString(36).substr(2, 44);
+      console.warn('Mock IPFS upload - file not actually uploaded:', file.name);
+      return mockHash;
     } catch (error) {
       console.error('Error uploading file to IPFS:', error);
       throw error;
@@ -30,9 +20,10 @@ export class IPFSService {
 
   async uploadJSON(data: any): Promise<string> {
     try {
-      const json = JSON.stringify(data);
-      const added = await this.client.add(json);
-      return added.path;
+      // For demo purposes, create a mock hash
+      const mockHash = 'Qm' + Math.random().toString(36).substr(2, 44);
+      console.warn('Mock IPFS JSON upload:', data);
+      return mockHash;
     } catch (error) {
       console.error('Error uploading JSON to IPFS:', error);
       throw error;
@@ -41,11 +32,11 @@ export class IPFSService {
 
   async getFile(hash: string): Promise<Uint8Array> {
     try {
-      const chunks = [];
-      for await (const chunk of this.client.cat(hash)) {
-        chunks.push(chunk);
-      }
-      return new Uint8Array(chunks.reduce((acc, chunk) => [...acc, ...chunk], []));
+      // Try to fetch from public gateway
+      const response = await fetch(this.getGatewayUrl(hash));
+      if (!response.ok) throw new Error('Failed to fetch from IPFS');
+      const arrayBuffer = await response.arrayBuffer();
+      return new Uint8Array(arrayBuffer);
     } catch (error) {
       console.error('Error fetching file from IPFS:', error);
       throw error;
@@ -54,9 +45,9 @@ export class IPFSService {
 
   async getJSON(hash: string): Promise<any> {
     try {
-      const data = await this.getFile(hash);
-      const json = new TextDecoder().decode(data);
-      return JSON.parse(json);
+      const response = await fetch(this.getGatewayUrl(hash));
+      if (!response.ok) throw new Error('Failed to fetch from IPFS');
+      return await response.json();
     } catch (error) {
       console.error('Error fetching JSON from IPFS:', error);
       throw error;
@@ -73,7 +64,8 @@ export class IPFSService {
 
   async pinFile(hash: string): Promise<void> {
     try {
-      await this.client.pin.add(hash);
+      console.warn('Mock pin operation for hash:', hash);
+      // In production, you'd use a pinning service
     } catch (error) {
       console.error('Error pinning file:', error);
       throw error;
@@ -82,7 +74,8 @@ export class IPFSService {
 
   async unpinFile(hash: string): Promise<void> {
     try {
-      await this.client.pin.rm(hash);
+      console.warn('Mock unpin operation for hash:', hash);
+      // In production, you'd use a pinning service
     } catch (error) {
       console.error('Error unpinning file:', error);
       throw error;

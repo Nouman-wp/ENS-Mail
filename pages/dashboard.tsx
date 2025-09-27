@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useAccount, useSigner } from 'wagmi';
+import { useAccount } from 'wagmi';
+import { useWalletClient } from 'wagmi';
 import { useRouter } from 'next/router';
 import { toast } from 'react-hot-toast';
 import { XMTPService } from '@/lib/xmtp';
@@ -12,7 +13,7 @@ import ProfileCard from '@/components/ProfileCard';
 
 const DashboardPage: React.FC = () => {
   const { address, isConnected } = useAccount();
-  const { data: signer } = useSigner();
+  const { data: walletClient } = useWalletClient();
   const router = useRouter();
   
   const [xmtpService] = useState(() => new XMTPService());
@@ -39,11 +40,11 @@ const DashboardPage: React.FC = () => {
   // Initialize XMTP
   useEffect(() => {
     const initializeXMTP = async () => {
-      if (!signer || !address) return;
+      if (!walletClient || !address) return;
 
       try {
         setIsLoading(true);
-        await xmtpService.initialize(signer);
+        await xmtpService.initialize(walletClient);
         setIsXMTPInitialized(true);
         toast.success('Connected to XMTP network');
       } catch (error) {
@@ -55,7 +56,7 @@ const DashboardPage: React.FC = () => {
     };
 
     initializeXMTP();
-  }, [signer, address, xmtpService]);
+  }, [walletClient, address, xmtpService]);
 
   // Load profile and conversations
   useEffect(() => {

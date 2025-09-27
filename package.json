@@ -11,9 +11,9 @@
     "deploy:limo": "node scripts/deploy-limo.js"
   },
   "dependencies": {
-    "@ensdomains/ensjs": "^3.0.0-alpha.77",
-    "@rainbow-me/rainbowkit": "^1.3.0",
-    "@tanstack/react-query": "^4.36.1",
+    "@ensdomains/ensjs": "^3.7.0",
+    "@rainbow-me/rainbowkit": "^2.0.0",
+    "@tanstack/react-query": "^5.0.0",
     "@xmtp/xmtp-js": "^11.6.2",
     "ethers": "^6.8.1",
     "ipfs-http-client": "^60.0.1",
@@ -21,8 +21,8 @@
     "react": "^18",
     "react-dom": "^18",
     "react-hot-toast": "^2.4.1",
-    "viem": "^1.19.9",
-    "wagmi": "^1.4.12"
+    "viem": "^2.9.2",
+    "wagmi": "^2.0.0"
   },
   "devDependencies": {
     "@types/node": "^20",

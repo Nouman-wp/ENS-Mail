@@ -2,19 +2,19 @@ import '@/styles/globals.css';
 import '@rainbow-me/rainbowkit/styles.css';
 import type { AppProps } from 'next/app';
 import { RainbowKitProvider } from '@rainbow-me/rainbowkit';
-import { WagmiConfig } from 'wagmi';
+import { WagmiProvider } from 'wagmi';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'react-hot-toast';
-import { wagmiConfig, chains } from '@/lib/wagmi';
+import { wagmiConfig } from '@/lib/wagmi';
 import Layout from '@/components/Layout';
 
 const queryClient = new QueryClient();
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
-    <WagmiConfig config={wagmiConfig}>
+    <WagmiProvider config={wagmiConfig}>
       <QueryClientProvider client={queryClient}>
-        <RainbowKitProvider chains={chains} coolMode>
+        <RainbowKitProvider>
           <Layout>
             <Component {...pageProps} />
           </Layout>
@@ -43,6 +43,6 @@ export default function App({ Component, pageProps }: AppProps) {
           />
         </RainbowKitProvider>
       </QueryClientProvider>
-    </WagmiConfig>
+    </WagmiProvider>
   );
 }
