@@ -189,16 +189,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - Discord: [discord.gg/ensmail](https://discord.gg/ensmail)
 - Twitter: [@ENSMail](https://twitter.com/ENSMail)
 
-## Roadmap
-
-- [ ] Group messaging support
-- [ ] File and media attachments
-- [ ] Push notifications
-- [ ] Mobile app (React Native)
-- [ ] Integration with other ENS domains
-- [ ] Advanced privacy features
-- [ ] Mainnet deployment
-
----
 
 Built with ❤️ for the decentralized web
