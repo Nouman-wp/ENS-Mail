@@ -67,7 +67,7 @@ npm run dev
 yarn dev
 ```
 
-6. Open [http://localhost:3000](http://localhost:3000) in your browser.
+6. Open [http://localhost:3000](http://localhost:3000) in your browser
 
 ### Required API Keys
 
